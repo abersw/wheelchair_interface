@@ -205,3 +205,7 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+add_compile_options(-std=c++11)
+add_executable(wheelchair_interface src/wheelchair_interface.cpp)
+target_link_libraries(wheelchair_interface ${catkin_LIBRARIES})
