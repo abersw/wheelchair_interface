@@ -56,7 +56,9 @@ void printSeparator(int spaceSize) {
 
 //calculate lines from files
 int calculateLines(std::string fileName) {
-	printf("DEBUG: calculateLines()\n");
+	if (DEBUG_CALCULATE_LINES == 1) {
+		printf("DEBUG: calculateLines()\n");
+	}
 	ifstream FILE_COUNTER(fileName);
 	std::string getlines;
 	int returnCounter = 0;
@@ -85,7 +87,9 @@ void doesWheelchairDumpPkgExist() {
 
 //get list of rooms and save to struct
 void roomListToStruct(std::string fileName) {
-	printf("DEBUG: roomListToStruct()\n");
+	if (DEBUG_ROOM_LIST_TO_STRUCT == 1) {
+		printf("DEBUG: roomListToStruct()\n");
+	}
 	std::string roomsDelimiter = ":";
 	ifstream FILE_READER(fileName);
 	std::string line;
@@ -120,10 +124,26 @@ int main(int argc, char * argv[]) {
     roomListLoc = wheelchair_dump_loc + "/dump/context_training/room.list";
 
     roomListToStruct(roomListLoc);
-    totalRooms = calculateLines(roomListLoc);
+    /*totalRooms = calculateLines(roomListLoc);
     for (int i = 0; i < totalRooms; i++) {
     	cout << room[i].roomName << "\n";
     }
+	*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     int count = 0;
     while (ros::ok()) {
