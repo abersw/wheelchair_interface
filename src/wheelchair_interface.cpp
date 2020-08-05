@@ -17,6 +17,7 @@ using namespace std;
 //Debugging lines
 int DEBUG_CALCULATE_LINES = 0;
 int DEBUG_ROOM_LIST_TO_STRUCT = 0;
+int DEBUG_TRAINING_FILES_TO_STRUCT = 0;
 
 FILE *filePointer; //pointer for file reader/writer
 
@@ -123,8 +124,10 @@ void roomListToStruct(std::string fileName) {
 }
 
 void readTrainingFile(std::string fileName, int roomIdParam) {
-	printSeparator(0);
-	printf("DEBUG: readTrainingFile()\n");
+	if (DEBUG_TRAINING_FILES_TO_STRUCT == 1) {
+		printSeparator(0);
+		printf("DEBUG: readTrainingFile()\n");
+	}
 	ofstream FILE_WRITER; //declare write file
 	ifstream FILE_READER; //declare read file
 	FILE_READER.open(fileName);
@@ -143,7 +146,9 @@ void readTrainingFile(std::string fileName, int roomIdParam) {
 	while (getline(FILE_READER, line)) {
 		if (lineNumber == 0) { //if line number is 0 - i.e. room name
 			//do nothing room name
-			cout << "reading Room Name: " << line << "\n";
+			if (DEBUG_TRAINING_FILES_TO_STRUCT == 1) {
+				cout << "reading Room Name: " << line << "\n";
+			}
 		}
 		else if (lineNumber == 1) { //if line number is 1 - i.e. training times
 			//get times trained
@@ -151,7 +156,9 @@ void readTrainingFile(std::string fileName, int roomIdParam) {
 			int getTimesTrained = ::atoi(line.c_str()); //cast times trained string to int
 			getTimesTrained++;
 			room[roomIdParam].timesTrained = getTimesTrained; //set times trained to correponding room
-			cout << "reading Times Trained: " << room[roomIdParam].timesTrained << "\n";
+			if (DEBUG_TRAINING_FILES_TO_STRUCT == 1) {
+				cout << "reading Times Trained: " << room[roomIdParam].timesTrained << "\n";
+			}
 		}
 		else if (lineNumber > 1) { //rest of the lines are trained objects
 			//find delimiter positions
@@ -175,18 +182,24 @@ void readTrainingFile(std::string fileName, int roomIdParam) {
 			for (int section = 0; section < delimiterNumber +1; section++) { //go through line at each delimiter position
 				if (section == 0) {
 					preTrained[roomIdParam][objectNumber].objectName = line.substr(0, delimiterPos[0]); //set first substring to pretrained struct
-					cout << "object number is " << objectNumber << "\n"; 
-					cout << "preTrained objectname is: " + preTrained[roomIdParam][objectNumber].objectName + "\n";
+					if (DEBUG_TRAINING_FILES_TO_STRUCT == 1) {
+						cout << "object number is " << objectNumber << "\n"; 
+						cout << "preTrained objectname is: " + preTrained[roomIdParam][objectNumber].objectName + "\n";
+					}
 				}
 				else if (section == 1) {
 					double weightingToDouble = std::atof(line.substr(delimiterPos[0] + 1, delimiterPos[1]).c_str()); //cast weighting from string to double
 					preTrained[roomIdParam][objectNumber].objectWeighting = weightingToDouble; //set second substring to pretrained struct and cast to double
-					cout << "preTrained objectWeighting is: " << preTrained[roomIdParam][objectNumber].objectWeighting << "\n";
+					if (DEBUG_TRAINING_FILES_TO_STRUCT == 1) {
+						cout << "preTrained objectWeighting is: " << preTrained[roomIdParam][objectNumber].objectWeighting << "\n";
+					}
 				}
 				else if (section == 2) {
 					double uniquenessToDouble = std::atof(line.substr(delimiterPos[1] + 1).c_str()); //cast uniqueness from string to double
 					preTrained[roomIdParam][objectNumber].uniqueness = uniquenessToDouble; //set third substring to pretrained struct and cast to double
-					cout << "preTrained uniqueness is: " << preTrained[roomIdParam][objectNumber].uniqueness << "\n";
+					if (DEBUG_TRAINING_FILES_TO_STRUCT == 1) {
+						cout << "preTrained uniqueness is: " << preTrained[roomIdParam][objectNumber].uniqueness << "\n";
+					}
 				}
 			}
 			delimiterNumber = 0; //set back to 0 when finished
@@ -194,14 +207,16 @@ void readTrainingFile(std::string fileName, int roomIdParam) {
 			objectNumber+=1;
 			//totalObjectsFromWeights = objectNumber;
 			room[roomIdParam].totalObjects = objectNumber; //set number of objects for room struct
-			cout << "total objects are " << room[roomIdParam].totalObjects << "\n";
-
+			if (DEBUG_TRAINING_FILES_TO_STRUCT == 1) {
+				cout << "total objects are " << room[roomIdParam].totalObjects << "\n";
+			}
 		}
 		lineNumber++;
 	}
 	FILE_READER.close();
-	
-	printSeparator(0);
+	if (DEBUG_TRAINING_FILES_TO_STRUCT == 1) {
+		printSeparator(0);
+	}
 }
 
 int main(int argc, char * argv[]) {
@@ -222,7 +237,7 @@ int main(int argc, char * argv[]) {
     roomListToStruct(roomListLoc);
     totalRooms = calculateLines(roomListLoc);
     for (int i = 0; i < totalRooms; i++) {
-    	cout << room[i].roomName << "\n";
+    	//cout << room[i].roomName << "\n";
     }
 	
 	//populate 2d array of [room][objects] -> pass this to readtrainingfile as parameter
