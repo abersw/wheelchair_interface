@@ -247,7 +247,9 @@ int main(int argc, char * argv[]) {
 		readTrainingFile(generateRoomWeightFile, i); //2nd param is room id
 	}
 
+	//find matching keywords from training file
 
+	
 
 
 
@@ -266,6 +268,8 @@ int main(int argc, char * argv[]) {
     while (ros::ok()) {
         //get string message from user
   	cout << "Where would you like to go?\n";
+  	//publish question to espeak
+
   	//string userInstruction;
   	std::string userInstruction;
   	getline(std::cin, userInstruction);
