@@ -27,6 +27,8 @@ std::string roomListLoc; //variable for storing room list location
 std::string mobilenetFileType = ".objects"; //file extention for mobilenet type
 std::string weightingFileType = ".weights"; //file extention for training type
 
+int questionState = 0; // 0 - ready for next question, 1 found match, 2 follow up question
+
 //variables and arrays for storing objects from training file
 std::string softwareVersion = "Version 0.1 - Draft";
 
@@ -248,20 +250,6 @@ int main(int argc, char * argv[]) {
 	}
 
 	//find matching keywords from training file
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     int count = 0;
