@@ -34,6 +34,9 @@ std::string weightingFileType = ".weights"; //file extention for training type
 int questionState = 0; // 0 - ready for next question, 1 found match, 2 follow up question
 
 //variables and arrays for storing objects from training file
+int wheelchair_interface_state = 0;
+std::string userInstruction;
+
 
 //contains list of rooms
 struct Rooms {
@@ -222,18 +225,33 @@ void readTrainingFile(std::string fileName, int roomIdParam) {
     }
 }
 
+std::string requestUserDestination(ros::Publisher espeak_pub) {
+    //notify user via interface and speech
+    std_msgs::String espeak_msg;
+    espeak_msg.data = "Where would you like to go";
+    espeak_pub.publish(espeak_msg);
+
+    cout << "Where would you like to go?\n";
+    std::string getuserInstruction;
+    getline(std::cin, getuserInstruction);
+
+    return userInstruction;
+}
+
 int main(int argc, char * argv[]) {
 
     ros::init(argc, argv, "wheelchair_interface");
     ros::NodeHandle nodeHandle;
 
     ros::Publisher wheelchairGoal_pub = nodeHandle.advertise<std_msgs::String>("wheelchair_goal", 1000);
+    ros::Publisher espeak_pub = nodeHandle.advertise<std_msgs::String>("/espeak_node/speak_line", 1000);
     ros::Rate loop_rate(10);
 
     doesWheelchairDumpPkgExist(); //check to see if dump package exists
     std::string wheelchair_dump_loc = ros::package::getPath("wheelchair_dump");
     weightingFileLoc = wheelchair_dump_loc + "/dump/context_training/";
     roomListLoc = wheelchair_dump_loc + "/dump/context_training/room.list";
+
 
 
 
@@ -251,17 +269,29 @@ int main(int argc, char * argv[]) {
     }
 
     //find matching keywords from training file
-
+    //0 is ready for new question
+    //1 is found match
+    //2 is need more info?
+    
 
     int count = 0;
     while (ros::ok()) {
+
+        switch(wheelchair_interface_state) {
+            case 0:
+                userInstruction = requestUserDestination(espeak_pub);
+                break;
+            case 1:
+                //do other things
+                break;
+        }
         //get string message from user
-        cout << "Where would you like to go?\n";
+        //cout << "Where would you like to go?\n";
         //publish question to espeak
 
         //string userInstruction;
-        std::string userInstruction;
-        getline(std::cin, userInstruction);
+        //std::string userInstruction;
+        //getline(std::cin, userInstruction);
         //std_msgs::String userInstructionROS = std_msgs::String.userInstruction.c_str();
         ROS_INFO_STREAM("MSG: " << userInstruction);
         //cout << userInstruction << "\n";
