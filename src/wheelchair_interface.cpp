@@ -280,9 +280,14 @@ int main(int argc, char * argv[]) {
         switch(wheelchair_interface_state) {
             case 0:
                 userInstruction = requestUserDestination(espeak_pub);
+                if (userInstruction != "") {
+                    wheelchair_interface_state = 1;
+                }
+                //state stays at 0, wait for request
                 break;
             case 1:
                 //do other things
+                cout << "bounced into state 1";
                 break;
         }
         //get string message from user
@@ -313,7 +318,7 @@ int main(int argc, char * argv[]) {
         */
         
         wheelchairGoal_pub.publish(msg);
-
+        cout << "ROS spinned \n";
         ros::spinOnce();
 
         //loop_rate.sleep();
