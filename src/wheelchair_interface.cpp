@@ -232,10 +232,10 @@ std::string requestUserDestination(ros::Publisher espeak_pub) {
     espeak_pub.publish(espeak_msg);
 
     cout << "Where would you like to go?\n";
-    std::string getuserInstruction;
-    getline(std::cin, getuserInstruction);
+    std::string getUserInstruction;
+    getline(std::cin, getUserInstruction);
 
-    return userInstruction;
+    return getUserInstruction;
 }
 
 int main(int argc, char * argv[]) {
