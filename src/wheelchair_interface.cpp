@@ -281,13 +281,20 @@ int main(int argc, char * argv[]) {
             case 0:
                 userInstruction = requestUserDestination(espeak_pub);
                 if (userInstruction != "") {
-                    wheelchair_interface_state = 1;
+                    wheelchair_interface_state = 1; //request is not blank
                 }
                 //state stays at 0, wait for request
                 break;
             case 1:
                 //do other things
-                cout << "bounced into state 1";
+                cout << "bounced into state 1\n";
+                for (int isRoom = 0; isRoom < totalRooms; isRoom++) {
+                    for (int isObject = 0; isObject < room[isRoom].totalObjects; isObject++) {
+                        if (userInstruction == preTrained[isRoom][isObject].objectName) {
+                            cout << "found match " << userInstruction << " in " << room[isRoom].roomName << "\n";  
+                        }
+                    }
+                }
                 break;
         }
         //get string message from user
