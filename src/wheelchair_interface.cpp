@@ -22,6 +22,7 @@ std::string softwareVersion = "Version 0.1 - Draft";
 int DEBUG_CALCULATE_LINES = 0;
 int DEBUG_ROOM_LIST_TO_STRUCT = 0;
 int DEBUG_TRAINING_FILES_TO_STRUCT = 0;
+int DEBUG_FIND_OBJECT_MATCHES = 1;
 
 FILE *filePointer; //pointer for file reader/writer
 
@@ -34,8 +35,9 @@ std::string weightingFileType = ".weights"; //file extention for training type
 int questionState = 0; // 0 - ready for next question, 1 found match, 2 follow up question
 
 //variables and arrays for storing objects from training file
-int wheelchair_interface_state = 0;
-std::string userInstruction;
+int wheelchair_interface_state = 1;
+std::string userInstructionRaw;
+std::string userInstruction[5];
 
 
 //contains list of rooms
@@ -54,10 +56,17 @@ struct Training {
     double uniqueness;
 };
 
+struct NavigateToDecision {
+    std::string roomName;
+    std::string objectName;
+
+};
+
 struct Rooms room[10000]; //list of rooms
 //roomId followed by objects list
 struct Training preTrained[1000][10000]; //saves items from file to struct
 struct Training trained[1000][10000]; //struct for writing back to files
+struct NavigateToDecision navigateToDecision[1];
 int totalRooms = 0;
 
 
@@ -225,6 +234,40 @@ void readTrainingFile(std::string fileName, int roomIdParam) {
     }
 }
 
+vector<string> explode(const string& str, const char& ch) {
+    string next;
+    vector<string> result;
+
+    // For each character in the string
+    for (string::const_iterator it = str.begin(); it != str.end(); it++) {
+        // If we've hit the terminal character
+        if (*it == ch) {
+            // If we have some characters accumulated
+            if (!next.empty()) {
+                // Add them to the result vector
+                result.push_back(next);
+                next.clear();
+            }
+        } else {
+            // Accumulate the next character into the sequence
+            next += *it;
+        }
+    }
+    if (!next.empty())
+         result.push_back(next);
+    return result;
+}
+
+void sentenceSplitter() {
+    char delimiter = ' ';
+
+    std::vector<std::string> result = explode(userInstructionRaw, delimiter);
+
+    for (size_t i = 0; i < result.size(); i++) {
+        cout << "\"" << result[i] << "\"" << endl;
+    }
+}
+
 std::string requestUserDestination(ros::Publisher espeak_pub) {
     //notify user via interface and speech
     std_msgs::String espeak_msg;
@@ -232,11 +275,50 @@ std::string requestUserDestination(ros::Publisher espeak_pub) {
     espeak_pub.publish(espeak_msg);
 
     cout << "Where would you like to go?\n";
-    std::string getUserInstruction;
-    getline(std::cin, getUserInstruction);
+    std::string getUserInstructionRaw;
+    getline(std::cin, getUserInstructionRaw);
 
-    return getUserInstruction;
+    return getUserInstructionRaw;
 }
+
+/*void findObjectOrRoom() {
+    //if user instruction is room then skip to other function, if not call find object matches
+    int userInstructionMatch = 0;
+    //user instruction is not a room, therefore must be an object...
+    for (int isRoom = 0; isRoom < totalRooms; isRoom++) {
+        int objectsFound = 0;
+        if (userInstructionRaw == room[isRoom].roomName) {
+            cout << "found room match \n";
+            //navigateTo(something);
+            userInstructionMatch = 1;
+            navigateToDecision[0].roomName = room[isRoom].roomName;
+        }
+        else {
+            for (int isObject = 0; isObject < room[isRoom].totalObjects; isObject++) {
+                if (userInstruction == preTrained[isRoom][isObject].objectName) {
+                    userInstructionMatch = 1;
+                    cout << "found match " << userInstruction << " in " << room[isRoom].roomName << "\n";
+                    trained[isRoom][objectsFound].objectName = preTrained[isRoom][isObject].objectName;
+                    trained[isRoom][objectsFound].objectWeighting = preTrained[isRoom][isObject].objectWeighting;
+                    trained[isRoom][objectsFound].uniqueness = preTrained[isRoom][isObject].uniqueness;
+                    if (DEBUG_FIND_OBJECT_MATCHES == 1) {
+                        cout << "found object " << objectsFound <<
+                        trained[isRoom][objectsFound].objectName << ":" <<
+                        trained[isRoom][objectsFound].objectWeighting << ":" <<
+                        trained[isRoom][objectsFound].uniqueness << "\n";
+                    }
+                    objectsFound++;
+                }
+            }
+        }
+    }
+    if (userInstructionMatch == 0) {
+        wheelchair_interface_state = 404; //match not found, go to error state
+    }
+    else if (userInstructionMatch == 1) {
+        wheelchair_interface_state = 3;
+    }
+}*/
 
 int main(int argc, char * argv[]) {
 
@@ -269,32 +351,46 @@ int main(int argc, char * argv[]) {
     }
 
     //find matching keywords from training file
-    //0 is ready for new question
-    //1 is found match
-    //2 is need more info?
+    //0 is exit program
+    //1 is ready for new question
+    //2 is finding match
+    //3 is need more info?
     
 
     int count = 0;
     while (ros::ok()) {
 
         switch(wheelchair_interface_state) {
-            case 0:
-                userInstruction = requestUserDestination(espeak_pub);
-                if (userInstruction != "") {
-                    wheelchair_interface_state = 1; //request is not blank
+            case 0: 
+                ros::shutdown();
+                exit(0);
+                break;
+            case 404:
+                //exit the program due to a problem
+                cout << "match not found - restarting process.\n";
+                wheelchair_interface_state = 1;
+                break;
+            case 1:
+                //get user instruction
+                userInstructionRaw = requestUserDestination(espeak_pub);
+                if (userInstructionRaw != "") {
+                    wheelchair_interface_state = 2; //request is not blank
                 }
                 //state stays at 0, wait for request
                 break;
-            case 1:
-                //do other things
+            case 2:
+                //find matches in training dictionary
                 cout << "bounced into state 1\n";
-                for (int isRoom = 0; isRoom < totalRooms; isRoom++) {
-                    for (int isObject = 0; isObject < room[isRoom].totalObjects; isObject++) {
-                        if (userInstruction == preTrained[isRoom][isObject].objectName) {
-                            cout << "found match " << userInstruction << " in " << room[isRoom].roomName << "\n";  
-                        }
-                    }
-                }
+                sentenceSplitter();
+                //findObjectOrRoom();
+                break;
+            case 3:
+                cout << "case3, found a match in casement \n";
+                //cout <<
+                break;
+            case 4:
+                //start context to location conversion
+                cout << "room name is " << navigateToDecision[0].roomName << "\n";
                 break;
         }
         //get string message from user
@@ -305,7 +401,7 @@ int main(int argc, char * argv[]) {
         //std::string userInstruction;
         //getline(std::cin, userInstruction);
         //std_msgs::String userInstructionROS = std_msgs::String.userInstruction.c_str();
-        ROS_INFO_STREAM("MSG: " << userInstruction);
+        ///////ROS_INFO_STREAM("MSG: " << userInstruction);
         //cout << userInstruction << "\n";
 
         std_msgs::String msg;
@@ -313,7 +409,7 @@ int main(int argc, char * argv[]) {
         //std::stringstream ss;
         //ss << "hello world " << count;
         //msg.data = ss.str();
-        msg.data = userInstruction;
+        /////msg.data = userInstruction;
 
         //ROS_INFO("%s", msg.data.c_str());
 
