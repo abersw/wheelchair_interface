@@ -1,3 +1,9 @@
+/*
+ * To-do list:
+ * Sentence splitting
+ * calculate rooms and object to navigate to
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,6 +28,7 @@ std::string softwareVersion = "Version 0.1 - Draft";
 int DEBUG_CALCULATE_LINES = 0;
 int DEBUG_ROOM_LIST_TO_STRUCT = 0;
 int DEBUG_TRAINING_FILES_TO_STRUCT = 0;
+int DEBUG_FIND_ROOM_MATCHES = 1;
 int DEBUG_FIND_OBJECT_MATCHES = 1;
 
 FILE *filePointer; //pointer for file reader/writer
@@ -66,8 +73,12 @@ struct Rooms room[10000]; //list of rooms
 //roomId followed by objects list
 struct Training preTrained[1000][10000]; //saves items from file to struct
 struct Training trained[1000][10000]; //struct for writing back to files
+struct NavigateToDecision preNavigateToDecision[1000];
 struct NavigateToDecision navigateToDecision[1];
 int totalRooms = 0;
+
+int userInstructionDetectedRooms = 0;
+int userInstructionDetectedObjects = 0;
 
 
 
@@ -234,39 +245,11 @@ void readTrainingFile(std::string fileName, int roomIdParam) {
     }
 }
 
-vector<string> explode(const string& str, const char& ch) {
-    string next;
-    vector<string> result;
-
-    // For each character in the string
-    for (string::const_iterator it = str.begin(); it != str.end(); it++) {
-        // If we've hit the terminal character
-        if (*it == ch) {
-            // If we have some characters accumulated
-            if (!next.empty()) {
-                // Add them to the result vector
-                result.push_back(next);
-                next.clear();
-            }
-        } else {
-            // Accumulate the next character into the sequence
-            next += *it;
-        }
-    }
-    if (!next.empty())
-         result.push_back(next);
-    return result;
+/*void sentenceSplitter() {
+    if (userInstructionRaw.find(s2) != std::string::npos) {
+        std::cout << "found!" << '\n';
 }
-
-void sentenceSplitter() {
-    char delimiter = ' ';
-
-    std::vector<std::string> result = explode(userInstructionRaw, delimiter);
-
-    for (size_t i = 0; i < result.size(); i++) {
-        cout << "\"" << result[i] << "\"" << endl;
-    }
-}
+}*/
 
 std::string requestUserDestination(ros::Publisher espeak_pub) {
     //notify user via interface and speech
@@ -279,6 +262,29 @@ std::string requestUserDestination(ros::Publisher espeak_pub) {
     getline(std::cin, getUserInstructionRaw);
 
     return getUserInstructionRaw;
+}
+
+void findObjectOrRoom() {
+    int numberOfRoomsDetected = 0;
+    for (int isRoom = 0; isRoom < totalRooms; isRoom++) {
+        string getRoomName = room[isRoom].roomName;
+        if (userInstructionRaw.find(getRoomName) != string::npos) {
+            if (DEBUG_FIND_ROOM_MATCHES == 1) {
+                cout << "found " << getRoomName << "in string\n";
+            }
+            preNavigateToDecision[numberOfRoomsDetected].roomName = getRoomName;
+            numberOfRoomsDetected++;
+        }
+    }
+    userInstructionDetectedRooms = numberOfRoomsDetected;
+    numberOfRoomsDetected = 0;
+
+    //read in pre trained data - room name | weighting | uniqueness - this should be available from context calculation
+    for (int isRoom = 0; isRoom < totalRooms; isRoom++) {
+        for (int isObject = 0; isObject < room[isRoom].totalObjects; isObject++) {
+            
+        }
+    }
 }
 
 /*void findObjectOrRoom() {
@@ -381,8 +387,8 @@ int main(int argc, char * argv[]) {
             case 2:
                 //find matches in training dictionary
                 cout << "bounced into state 1\n";
-                sentenceSplitter();
-                //findObjectOrRoom();
+                //sentenceSplitter();
+                findObjectOrRoom();
                 break;
             case 3:
                 cout << "case3, found a match in casement \n";
