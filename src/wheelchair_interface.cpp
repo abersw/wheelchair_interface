@@ -307,10 +307,6 @@ void findObjectOrRoom() {
     }
 }
 
-void decideRoom() {
-    navigateToDecision[0].roomName = decisionListRooms[0].roomName;
-    
-}
 
 /*void findObjectOrRoom() {
     //if user instruction is room then skip to other function, if not call find object matches
