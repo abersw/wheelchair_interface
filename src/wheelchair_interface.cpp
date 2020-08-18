@@ -270,7 +270,7 @@ void findObjectOrRoom() {
         string getRoomName = room[isRoom].roomName;
         if (userInstructionRaw.find(getRoomName) != string::npos) {
             if (DEBUG_FIND_ROOM_MATCHES == 1) {
-                cout << "found " << getRoomName << "in string\n";
+                cout << "found " << getRoomName << " in string\n";
             }
             preNavigateToDecision[numberOfRoomsDetected].roomName = getRoomName;
             numberOfRoomsDetected++;
@@ -281,8 +281,14 @@ void findObjectOrRoom() {
 
     //read in pre trained data - room name | weighting | uniqueness - this should be available from context calculation
     for (int isRoom = 0; isRoom < totalRooms; isRoom++) {
+        string getRoomName = room[isRoom].roomName;
         for (int isObject = 0; isObject < room[isRoom].totalObjects; isObject++) {
-            
+            string getObjectName = preTrained[isRoom][isObject].objectName;
+            if (userInstructionRaw.find(getObjectName) != string::npos) {
+                if (DEBUG_FIND_OBJECT_MATCHES == 1) {
+                cout << "found " << getObjectName << " in " << getRoomName << "\n";
+            }
+            }
         }
     }
 }
@@ -386,7 +392,7 @@ int main(int argc, char * argv[]) {
                 break;
             case 2:
                 //find matches in training dictionary
-                cout << "bounced into state 1\n";
+                //cout << "bounced into state 1\n";
                 //sentenceSplitter();
                 findObjectOrRoom();
                 break;
@@ -427,7 +433,7 @@ int main(int argc, char * argv[]) {
         */
         
         wheelchairGoal_pub.publish(msg);
-        cout << "ROS spinned \n";
+        //cout << "ROS spinned \n";
         ros::spinOnce();
 
         //loop_rate.sleep();
