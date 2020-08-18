@@ -280,25 +280,36 @@ void findObjectOrRoom() {
     }
     decisionListRoomsTotal = numberOfRoomsDetected;
     numberOfRoomsDetected = 0;
-
-    //read in pre trained data - room name | weighting | uniqueness - this should be available from context calculation
-    int numberOfObjectsDetected = 0;
-    for (int isRoom = 0; isRoom < totalRooms; isRoom++) {
-        string getRoomName = room[isRoom].roomName;
-        for (int isObject = 0; isObject < room[isRoom].totalObjects; isObject++) {
-            string getObjectName = preTrained[isRoom][isObject].objectName;
-            if (userInstructionRaw.find(getObjectName) != string::npos) {
-                if (DEBUG_FIND_OBJECT_MATCHES == 1) {
-                    cout << "found " << getObjectName << " in " << getRoomName << "\n";
+    if (decisionListRoomsTotal > 1) {
+        wheelchair_interface_state = 400;
+    }
+    else {
+        //read in pre trained data - room name | weighting | uniqueness - this should be available from context calculation
+        int numberOfObjectsDetected = 0;
+        for (int isRoom = 0; isRoom < totalRooms; isRoom++) {
+            string getRoomName = room[isRoom].roomName;
+            for (int isObject = 0; isObject < room[isRoom].totalObjects; isObject++) {
+                string getObjectName = preTrained[isRoom][isObject].objectName;
+                if (userInstructionRaw.find(getObjectName) != string::npos) {
+                    if (DEBUG_FIND_OBJECT_MATCHES == 1) {
+                        cout << "found " << getObjectName << " in " << getRoomName << "\n";
+                    }
+                    decisionListObjects[numberOfObjectsDetected].roomName = getRoomName;
+                    decisionListObjects[numberOfObjectsDetected].objectName = getObjectName;
+                    numberOfObjectsDetected++;
                 }
-                decisionListObjects[numberOfObjectsDetected].roomName = getRoomName;
-                decisionListObjects[numberOfObjectsDetected].objectName = getObjectName;
-                numberOfObjectsDetected++;
             }
         }
+        decisionListObjectsTotal = numberOfObjectsDetected;
+        numberOfObjectsDetected = 0;
+        cout << "finished room and object structing\n";
+        wheelchair_interface_state = 3; //finished structing matching data
     }
-    decisionListObjectsTotal = numberOfObjectsDetected;
-    numberOfObjectsDetected = 0;
+}
+
+void decideRoom() {
+    navigateToDecision[0].roomName = decisionListRooms[0].roomName;
+    
 }
 
 /*void findObjectOrRoom() {
@@ -385,10 +396,15 @@ int main(int argc, char * argv[]) {
                 ros::shutdown();
                 exit(0);
                 break;
+            case 400:
+                //too many rooms
+                cout << "too many rooms detected, please choose one\n";
+                wheelchair_interface_state = 0;
+                break;
             case 404:
                 //exit the program due to a problem
                 cout << "match not found - restarting process.\n";
-                wheelchair_interface_state = 1;
+                wheelchair_interface_state = 0;
                 break;
             case 1:
                 //get user instruction
@@ -399,16 +415,13 @@ int main(int argc, char * argv[]) {
                 //state stays at 0, wait for request
                 break;
             case 2:
-                //find matches in training dictionary
-                //cout << "bounced into state 1\n";
-                //sentenceSplitter();
-                findObjectOrRoom();
+                findObjectOrRoom(); //struct matching rooms and objects
                 break;
             case 3:
-                cout << "case3, found a match in casement \n";
-                //cout <<
+                //calculate context and work out which room and or object to navigate to
+                //cout << "jumped into case 3\n";
                 break;
-            case 4:
+            case 100:
                 //start context to location conversion
                 cout << "room name is " << navigateToDecision[0].roomName << "\n";
                 break;
