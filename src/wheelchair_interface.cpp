@@ -66,6 +66,7 @@ struct Training {
 struct NavigateToDecision {
     std::string roomName;
     std::string objectName;
+    int id;
 
 };
 
@@ -73,12 +74,13 @@ struct Rooms room[10000]; //list of rooms
 //roomId followed by objects list
 struct Training preTrained[1000][10000]; //saves items from file to struct
 struct Training trained[1000][10000]; //struct for writing back to files
-struct NavigateToDecision preNavigateToDecision[1000];
+struct NavigateToDecision decisionListRooms[1000];
+struct NavigateToDecision decisionListObjects[10000];
 struct NavigateToDecision navigateToDecision[1];
 int totalRooms = 0;
 
-int userInstructionDetectedRooms = 0;
-int userInstructionDetectedObjects = 0;
+int decisionListRoomsTotal = 0;
+int decisionListObjectsTotal = 0;
 
 
 
@@ -272,25 +274,31 @@ void findObjectOrRoom() {
             if (DEBUG_FIND_ROOM_MATCHES == 1) {
                 cout << "found " << getRoomName << " in string\n";
             }
-            preNavigateToDecision[numberOfRoomsDetected].roomName = getRoomName;
+            decisionListRooms[numberOfRoomsDetected].roomName = getRoomName;
             numberOfRoomsDetected++;
         }
     }
-    userInstructionDetectedRooms = numberOfRoomsDetected;
+    decisionListRoomsTotal = numberOfRoomsDetected;
     numberOfRoomsDetected = 0;
 
     //read in pre trained data - room name | weighting | uniqueness - this should be available from context calculation
+    int numberOfObjectsDetected = 0;
     for (int isRoom = 0; isRoom < totalRooms; isRoom++) {
         string getRoomName = room[isRoom].roomName;
         for (int isObject = 0; isObject < room[isRoom].totalObjects; isObject++) {
             string getObjectName = preTrained[isRoom][isObject].objectName;
             if (userInstructionRaw.find(getObjectName) != string::npos) {
                 if (DEBUG_FIND_OBJECT_MATCHES == 1) {
-                cout << "found " << getObjectName << " in " << getRoomName << "\n";
-            }
+                    cout << "found " << getObjectName << " in " << getRoomName << "\n";
+                }
+                decisionListObjects[numberOfObjectsDetected].roomName = getRoomName;
+                decisionListObjects[numberOfObjectsDetected].objectName = getObjectName;
+                numberOfObjectsDetected++;
             }
         }
     }
+    decisionListObjectsTotal = numberOfObjectsDetected;
+    numberOfObjectsDetected = 0;
 }
 
 /*void findObjectOrRoom() {
