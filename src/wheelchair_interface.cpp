@@ -66,6 +66,9 @@ struct Training {
 struct NavigateToDecision {
     std::string roomName;
     std::string objectName;
+    int objectWeighting;
+    int uniqueness;
+    int score;
     int id;
 
 };
