@@ -45,6 +45,7 @@ int questionState = 0; // 0 - ready for next question, 1 found match, 2 follow u
 int wheelchair_interface_state = 1;
 std::string userInstructionRaw;
 std::string userInstruction[5];
+int printOnce = 1;
 
 
 //contains list of rooms
@@ -419,6 +420,10 @@ int main(int argc, char * argv[]) {
             case 3:
                 //calculate context and work out which room and or object to navigate to
                 //cout << "jumped into case 3\n";
+                if (printOnce == 1) {
+                    cout << "navigating to object\n";
+                    printOnce = 0;
+                }
                 break;
             case 100:
                 //start context to location conversion
