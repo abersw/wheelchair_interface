@@ -13,6 +13,7 @@
 
 #include "ros/ros.h" //main ROS library
 #include "std_msgs/String.h"
+#include "move_base_msgs/MoveBaseActionGoal.h" //move base msg for sending map goals
 
 #include <fstream> //for writing and reading files in c++
 #include <ros/package.h> //find ROS packages, needs roslib dependency
@@ -356,7 +357,7 @@ int main(int argc, char * argv[]) {
     ros::init(argc, argv, "wheelchair_interface");
     ros::NodeHandle nodeHandle;
 
-    ros::Publisher wheelchairGoal_pub = nodeHandle.advertise<std_msgs::String>("wheelchair_goal", 1000);
+    ros::Publisher wheelchairGoal_pub = nodeHandle.advertise<move_base_msgs::MoveBaseActionGoal>("/move_base/goal", 1000);
     ros::Publisher espeak_pub = nodeHandle.advertise<std_msgs::String>("/espeak_node/speak_line", 1000);
     ros::Rate loop_rate(10);
 
@@ -441,7 +442,38 @@ int main(int argc, char * argv[]) {
         ///////ROS_INFO_STREAM("MSG: " << userInstruction);
         //cout << userInstruction << "\n";
 
-        std_msgs::String msg;
+        move_base_msgs::MoveBaseActionGoal chosenGoal;
+
+        chosenGoal.header;
+        chosenGoal.header.seq = 0;
+        chosenGoal.header.stamp;
+        chosenGoal.header.stamp.sec = 0;
+        chosenGoal.header.stamp.nsec = 0;
+        chosenGoal.header.frame_id = "";
+
+        chosenGoal.goal_id;
+        chosenGoal.goal_id.stamp.sec = 0;
+        chosenGoal.goal_id.stamp.nsec = 0;
+        chosenGoal.goal_id.id;
+
+        chosenGoal.goal;
+        chosenGoal.goal.target_pose;
+        chosenGoal.goal.target_pose.header;
+        chosenGoal.goal.target_pose.header.seq = 0;
+        chosenGoal.goal.target_pose.header.stamp;
+        chosenGoal.goal.target_pose.header.stamp.sec = 0;
+        chosenGoal.goal.target_pose.header.stamp.nsec = 0;
+        chosenGoal.goal.target_pose.header.frame_id = "map";
+
+        chosenGoal.goal.target_pose.pose;
+        chosenGoal.goal.target_pose.pose.position;
+        chosenGoal.goal.target_pose.pose.position.x = -3.003546478188607;
+        chosenGoal.goal.target_pose.pose.position.y = 1.0007878321900925;
+        chosenGoal.goal.target_pose.pose.position.z = 1.427680642769602e-07;
+        chosenGoal.goal.target_pose.pose.orientation.x = -4.32232932053e-07;
+        chosenGoal.goal.target_pose.pose.orientation.y = 4.866748911062099e-09;
+        chosenGoal.goal.target_pose.pose.orientation.z = -0.010309099663378125;
+        chosenGoal.goal.target_pose.pose.orientation.w = 0.9999468598200324;
 
         //std::stringstream ss;
         //ss << "hello world " << count;
@@ -457,7 +489,7 @@ int main(int argc, char * argv[]) {
          * in the constructor above.
         */
         
-        wheelchairGoal_pub.publish(msg);
+        wheelchairGoal_pub.publish(chosenGoal);
         //cout << "ROS spinned \n";
         ros::spinOnce();
 
