@@ -379,13 +379,13 @@ void navigateToKitchen(ros::Publisher wheelchairGoal_pub) {
 
     chosenGoal.goal.target_pose.pose;
     chosenGoal.goal.target_pose.pose.position;
-    chosenGoal.goal.target_pose.pose.position.x = -3.003546478188607;
-    chosenGoal.goal.target_pose.pose.position.y = 1.0007878321900925;
-    chosenGoal.goal.target_pose.pose.position.z = 1.427680642769602e-07;
-    chosenGoal.goal.target_pose.pose.orientation.x = -4.32232932053e-07;
-    chosenGoal.goal.target_pose.pose.orientation.y = 4.866748911062099e-09;
-    chosenGoal.goal.target_pose.pose.orientation.z = -0.010309099663378125;
-    chosenGoal.goal.target_pose.pose.orientation.w = 0.9999468598200324;
+    chosenGoal.goal.target_pose.pose.position.x = -2.3120318794612325;
+    chosenGoal.goal.target_pose.pose.position.y = 4.593713000594187;
+    chosenGoal.goal.target_pose.pose.position.z = -0.00013354508166223134;
+    chosenGoal.goal.target_pose.pose.orientation.x = 0.00046188794432522676;
+    chosenGoal.goal.target_pose.pose.orientation.y = -0.00043531716502469286;
+    chosenGoal.goal.target_pose.pose.orientation.z = 0.5329078756989428;
+    chosenGoal.goal.target_pose.pose.orientation.w = -0.8461730279183812;
 
     wheelchairGoal_pub.publish(chosenGoal);
     cout << "published goal\n";
@@ -466,6 +466,7 @@ int main(int argc, char * argv[]) {
                 }*/
                 if (decisionListRooms[0].roomName == "kitchen") {
                     navigateToKitchen(wheelchairGoal_pub);
+                    wheelchair_interface_state = 0;
                 }
                 break;
             case 100:
