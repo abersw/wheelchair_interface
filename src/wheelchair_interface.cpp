@@ -352,6 +352,45 @@ void findObjectOrRoom() {
     }
 }*/
 
+void navigateToKitchen(ros::Publisher wheelchairGoal_pub) {
+    cout << "navigating to kitchen\n";
+    move_base_msgs::MoveBaseActionGoal chosenGoal;
+
+    chosenGoal.header;
+    chosenGoal.header.seq = 0;
+    chosenGoal.header.stamp;
+    chosenGoal.header.stamp.sec = 0;
+    chosenGoal.header.stamp.nsec = 0;
+    chosenGoal.header.frame_id = "";
+
+    chosenGoal.goal_id;
+    chosenGoal.goal_id.stamp.sec = 0;
+    chosenGoal.goal_id.stamp.nsec = 0;
+    chosenGoal.goal_id.id;
+
+    chosenGoal.goal;
+    chosenGoal.goal.target_pose;
+    chosenGoal.goal.target_pose.header;
+    chosenGoal.goal.target_pose.header.seq = 0;
+    chosenGoal.goal.target_pose.header.stamp;
+    chosenGoal.goal.target_pose.header.stamp.sec = 0;
+    chosenGoal.goal.target_pose.header.stamp.nsec = 0;
+    chosenGoal.goal.target_pose.header.frame_id = "map";
+
+    chosenGoal.goal.target_pose.pose;
+    chosenGoal.goal.target_pose.pose.position;
+    chosenGoal.goal.target_pose.pose.position.x = -3.003546478188607;
+    chosenGoal.goal.target_pose.pose.position.y = 1.0007878321900925;
+    chosenGoal.goal.target_pose.pose.position.z = 1.427680642769602e-07;
+    chosenGoal.goal.target_pose.pose.orientation.x = -4.32232932053e-07;
+    chosenGoal.goal.target_pose.pose.orientation.y = 4.866748911062099e-09;
+    chosenGoal.goal.target_pose.pose.orientation.z = -0.010309099663378125;
+    chosenGoal.goal.target_pose.pose.orientation.w = 0.9999468598200324;
+
+    wheelchairGoal_pub.publish(chosenGoal);
+    cout << "published goal\n";
+}
+
 int main(int argc, char * argv[]) {
 
     ros::init(argc, argv, "wheelchair_interface");
@@ -421,9 +460,12 @@ int main(int argc, char * argv[]) {
             case 3:
                 //calculate context and work out which room and or object to navigate to
                 //cout << "jumped into case 3\n";
-                if (printOnce == 1) {
+                /*if (printOnce == 1) {
                     cout << "navigating to object\n";
                     printOnce = 0;
+                }*/
+                if (decisionListRooms[0].roomName == "kitchen") {
+                    navigateToKitchen(wheelchairGoal_pub);
                 }
                 break;
             case 100:
@@ -442,38 +484,7 @@ int main(int argc, char * argv[]) {
         ///////ROS_INFO_STREAM("MSG: " << userInstruction);
         //cout << userInstruction << "\n";
 
-        move_base_msgs::MoveBaseActionGoal chosenGoal;
-
-        chosenGoal.header;
-        chosenGoal.header.seq = 0;
-        chosenGoal.header.stamp;
-        chosenGoal.header.stamp.sec = 0;
-        chosenGoal.header.stamp.nsec = 0;
-        chosenGoal.header.frame_id = "";
-
-        chosenGoal.goal_id;
-        chosenGoal.goal_id.stamp.sec = 0;
-        chosenGoal.goal_id.stamp.nsec = 0;
-        chosenGoal.goal_id.id;
-
-        chosenGoal.goal;
-        chosenGoal.goal.target_pose;
-        chosenGoal.goal.target_pose.header;
-        chosenGoal.goal.target_pose.header.seq = 0;
-        chosenGoal.goal.target_pose.header.stamp;
-        chosenGoal.goal.target_pose.header.stamp.sec = 0;
-        chosenGoal.goal.target_pose.header.stamp.nsec = 0;
-        chosenGoal.goal.target_pose.header.frame_id = "map";
-
-        chosenGoal.goal.target_pose.pose;
-        chosenGoal.goal.target_pose.pose.position;
-        chosenGoal.goal.target_pose.pose.position.x = -3.003546478188607;
-        chosenGoal.goal.target_pose.pose.position.y = 1.0007878321900925;
-        chosenGoal.goal.target_pose.pose.position.z = 1.427680642769602e-07;
-        chosenGoal.goal.target_pose.pose.orientation.x = -4.32232932053e-07;
-        chosenGoal.goal.target_pose.pose.orientation.y = 4.866748911062099e-09;
-        chosenGoal.goal.target_pose.pose.orientation.z = -0.010309099663378125;
-        chosenGoal.goal.target_pose.pose.orientation.w = 0.9999468598200324;
+        
 
         //std::stringstream ss;
         //ss << "hello world " << count;
@@ -489,7 +500,7 @@ int main(int argc, char * argv[]) {
          * in the constructor above.
         */
         
-        wheelchairGoal_pub.publish(chosenGoal);
+        
         //cout << "ROS spinned \n";
         ros::spinOnce();
 
