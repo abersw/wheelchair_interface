@@ -71,8 +71,12 @@ int main(int argc, char * argv[]) {
                 //get user instruction
                 userInstructionRaw = requestUserDestination();
                 if (userInstructionRaw != "") {
-                    wheelchair_interface_state = 2; //request is not blank
+                    wheelchair_interface_state = 2; //request is not blank 
                 }
+                break;
+            case 2:
+                cout << userInstructionRaw << endl;
+                wheelchair_interface_state = 1;
                 break;
         }
         
