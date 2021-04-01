@@ -26,12 +26,28 @@ std::string softwareVersion = "Version 0.1 - Draft";
 
 const bool DEBUG_main = 1;
 
+ros::Publisher *ptr_publish_espeak;
+
 int wheelchair_interface_state = 1;
+std::string userInstructionRaw;
 
 void shutdownROSnode() {
     cout << "shutting down ROS node" << endl;
     ros::shutdown();
     exit(0);
+}
+
+std::string requestUserDestination() {
+    //notify user via interface and speech
+    std_msgs::String espeak_msg;
+    espeak_msg.data = "Where would you like to go";
+    ptr_publish_espeak->publish(espeak_msg);
+
+    cout << "Where would you like to go?\n";
+    std::string getUserInstructionRaw;
+    getline(std::cin, getUserInstructionRaw);
+
+    return getUserInstructionRaw;
 }
 
 
@@ -42,6 +58,7 @@ int main(int argc, char * argv[]) {
 
     ros::Publisher wheelchairGoal_pub = nodeHandle.advertise<move_base_msgs::MoveBaseActionGoal>("/move_base/goal", 1000);
     ros::Publisher espeak_pub = nodeHandle.advertise<std_msgs::String>("/espeak_node/speak_line", 1000);
+    ptr_publish_espeak = &espeak_pub;
     ros::Rate loop_rate(10);
 
     while (ros::ok()) {
@@ -52,7 +69,10 @@ int main(int argc, char * argv[]) {
                 break;
             case 1:
                 //get user instruction
-                cout << "jump into this function" << endl;
+                userInstructionRaw = requestUserDestination();
+                if (userInstructionRaw != "") {
+                    wheelchair_interface_state = 2; //request is not blank
+                }
                 break;
         }
         
