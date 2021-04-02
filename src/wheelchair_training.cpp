@@ -24,6 +24,7 @@ using namespace std;
 //The program is in:
 std::string softwareVersion = "Version 0.1 - Draft";
 
+const bool DEBUG_requestUserInput = 1;
 const bool DEBUG_main = 1;
 
 ros::Publisher *ptr_publish_espeak;
@@ -37,17 +38,24 @@ void shutdownROSnode() {
     exit(0);
 }
 
-std::string requestUserDestination() {
+/**
+ * Function to return user input when prompted to enter the room name
+ *
+ * @return getUserInstructionRaw - returns direct input from user
+ */
+std::string requestUserInput() {
     //notify user via interface and speech
-    std_msgs::String espeak_msg;
-    espeak_msg.data = "Where would you like to go";
-    ptr_publish_espeak->publish(espeak_msg);
+    std::string instruction = "What's the room name"; //set question for user interface
+    cout << instruction; //print question to interface
 
-    cout << "Where would you like to go?\n";
-    std::string getUserInstructionRaw;
-    getline(std::cin, getUserInstructionRaw);
+    std_msgs::String espeak_msg; //initialise espak ROS msg
+    espeak_msg.data = instruction; //assign user question to espeak data
+    ptr_publish_espeak->publish(espeak_msg); //publish espeak msg
 
-    return getUserInstructionRaw;
+    std::string getUserInstructionRaw; //initialise variable for user input
+    getline(std::cin, getUserInstructionRaw); //read line from user interface
+
+    return getUserInstructionRaw; //return user input
 }
 
 
@@ -69,7 +77,7 @@ int main(int argc, char * argv[]) {
                 break;
             case 1:
                 //get user instruction
-                userInstructionRaw = requestUserDestination();
+                userInstructionRaw = requestUserInput();
                 if (userInstructionRaw != "") {
                     wheelchair_interface_state = 2; //request is not blank 
                 }
