@@ -17,9 +17,6 @@
 #include <sstream>
 using namespace std;
 
-//The program is in:
-std::string softwareVersion = "Version 0.1 - Draft";
-
 const bool DEBUG_requestUserInput = 0;
 const bool DEBUG_main = 0;
 
