@@ -47,7 +47,7 @@ void shutdownROSnode() {
 std::string requestUserInput() {
     //notify user via interface and speech
     std::string instruction = "What's the room name"; //set question for user interface
-    cout << instruction; //print question to interface
+    cout << instruction << endl; //print question to interface
 
     std_msgs::String espeak_msg; //initialise espak ROS msg
     espeak_msg.data = instruction; //assign user question to espeak data
@@ -58,6 +58,13 @@ std::string requestUserInput() {
     transform(getUserInstructionRaw.begin(), getUserInstructionRaw.end(), getUserInstructionRaw.begin(), ::tolower); //transform string to lower case letters
 
     return getUserInstructionRaw; //return user input
+}
+
+void publishRoomName() {
+    std_msgs::String roomNameMsg;
+    roomNameMsg.data = userInstructionRaw;
+
+    ptr_publish_roomName->publish(roomNameMsg);
 }
 
 
@@ -88,6 +95,7 @@ int main(int argc, char * argv[]) {
                 break;
             case 2:
                 cout << userInstructionRaw << endl;
+                publishRoomName();
                 wheelchair_interface_state = 1;
                 break;
         }
