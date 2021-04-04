@@ -1,31 +1,27 @@
 /*
- * To-do list:
+ * wheelchair_training.cpp
+ * wheelchair_interface
+ * version: 0.0.1 Majestic Maidenhair
+ * Status: Pre-Alpha
  * 
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <unistd.h>
-//#include <getopt.h>
-//#include <iostream> //io library
 
 #include "ros/ros.h" //main ROS library
 #include "std_msgs/String.h"
-#include "move_base_msgs/MoveBaseActionGoal.h" //move base msg for sending map goals
 
-#include <fstream> //for writing and reading files in c++
-#include <ros/package.h> //find ROS packages, needs roslib dependency
 
 #include <sstream>
 using namespace std;
 
-//The wheelchair interface is written by Tomos Fearn (tof7@aber.ac.uk)
 //The program is in:
 std::string softwareVersion = "Version 0.1 - Draft";
 
-const bool DEBUG_requestUserInput = 1;
-const bool DEBUG_main = 1;
+const bool DEBUG_requestUserInput = 0;
+const bool DEBUG_main = 0;
 
 ros::Publisher *ptr_publish_espeak;
 ros::Publisher *ptr_publish_roomName;
@@ -70,12 +66,11 @@ void publishRoomName() {
 
 int main(int argc, char * argv[]) {
 
-    ros::init(argc, argv, "wheelchair_training");
+    ros::init(argc, argv, "wheelchair_training_interface");
     ros::NodeHandle nodeHandle;
 
-    ros::Publisher wheelchairGoal_pub = nodeHandle.advertise<move_base_msgs::MoveBaseActionGoal>("/move_base/goal", 1000);
-    ros::Publisher espeak_pub = nodeHandle.advertise<std_msgs::String>("/espeak_node/speak_line", 1000);
-    ros::Publisher roomName_pub = nodeHandle.advertise<std_msgs::String>("/wheelchair_robot/user/room_name", 10);
+    ros::Publisher espeak_pub = nodeHandle.advertise<std_msgs::String>("/espeak_node/speak_line", 1000); //publisher to espeak (voice) node
+    ros::Publisher roomName_pub = nodeHandle.advertise<std_msgs::String>("/wheelchair_robot/user/room_name", 10); //publisher to assign room name
     ptr_publish_espeak = &espeak_pub;
     ptr_publish_roomName = &roomName_pub;
     ros::Rate loop_rate(10);
