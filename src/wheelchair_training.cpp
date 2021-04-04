@@ -28,6 +28,7 @@ const bool DEBUG_requestUserInput = 1;
 const bool DEBUG_main = 1;
 
 ros::Publisher *ptr_publish_espeak;
+ros::Publisher *ptr_publish_roomName;
 
 int wheelchair_interface_state = 1;
 std::string userInstructionRaw;
@@ -54,6 +55,7 @@ std::string requestUserInput() {
 
     std::string getUserInstructionRaw; //initialise variable for user input
     getline(std::cin, getUserInstructionRaw); //read line from user interface
+    transform(getUserInstructionRaw.begin(), getUserInstructionRaw.end(), getUserInstructionRaw.begin(), ::tolower); //transform string to lower case letters
 
     return getUserInstructionRaw; //return user input
 }
@@ -66,7 +68,9 @@ int main(int argc, char * argv[]) {
 
     ros::Publisher wheelchairGoal_pub = nodeHandle.advertise<move_base_msgs::MoveBaseActionGoal>("/move_base/goal", 1000);
     ros::Publisher espeak_pub = nodeHandle.advertise<std_msgs::String>("/espeak_node/speak_line", 1000);
+    ros::Publisher roomName_pub = nodeHandle.advertise<std_msgs::String>("/wheelchair_robot/user/room_name", 10);
     ptr_publish_espeak = &espeak_pub;
+    ptr_publish_roomName = &roomName_pub;
     ros::Rate loop_rate(10);
 
     while (ros::ok()) {
