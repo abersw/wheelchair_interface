@@ -26,6 +26,9 @@ ros::Publisher *ptr_publish_roomName;
 int wheelchair_interface_state = 1;
 std::string userInstructionRaw;
 
+/**
+ * Function to shutdown ROS node safely
+ */
 void shutdownROSnode() {
     cout << "shutting down ROS node" << endl;
     ros::shutdown();
@@ -53,6 +56,9 @@ std::string requestUserInput() {
     return getUserInstructionRaw; //return user input
 }
 
+/**
+ * Function to publish the room name as ROS msg
+ */
 void publishRoomName() {
     std_msgs::String roomNameMsg;
     roomNameMsg.data = userInstructionRaw;
@@ -60,7 +66,11 @@ void publishRoomName() {
     ptr_publish_roomName->publish(roomNameMsg);
 }
 
-
+/**
+ * Main function publishes espeak node and room name topics
+ *
+ * @return 0 - shouldn't reach this part unless shutting down
+ */
 int main(int argc, char * argv[]) {
 
     ros::init(argc, argv, "wheelchair_training_interface");
@@ -80,19 +90,21 @@ int main(int argc, char * argv[]) {
                 break;
             case 1:
                 //get user instruction
-                userInstructionRaw = requestUserInput();
-                if (userInstructionRaw != "") {
-                    wheelchair_interface_state = 2; //request is not blank 
+                userInstructionRaw = requestUserInput(); //request the user's input
+                if (userInstructionRaw != "") { //if user instruction is not blank
+                    wheelchair_interface_state = 2; //go to state 2 for publishing room name
                 }
                 break;
             case 2:
-                cout << userInstructionRaw << endl;
-                publishRoomName();
+                if (DEBUG_main) {
+                    cout << userInstructionRaw << endl; //return room name
+                }
+                publishRoomName(); //publish user instruction as ROS topic
                 wheelchair_interface_state = 1;
                 break;
         }
         
-        ros::spinOnce();
+        ros::spinOnce(); //keep looping program
         if (DEBUG_main) {
             cout << "ROS spinned" << endl;
         }
