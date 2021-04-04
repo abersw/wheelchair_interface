@@ -42,7 +42,7 @@ void shutdownROSnode() {
  */
 std::string requestUserInput() {
     //notify user via interface and speech
-    std::string instruction = "What's the room name"; //set question for user interface
+    std::string instruction = "Where am I"; //set question for user interface
     cout << instruction << endl; //print question to interface
 
     std_msgs::String espeak_msg; //initialise espak ROS msg
