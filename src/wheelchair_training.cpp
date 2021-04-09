@@ -1,8 +1,8 @@
 /*
  * wheelchair_training.cpp
  * wheelchair_interface
- * version: 0.0.1 Majestic Maidenhair
- * Status: Pre-Alpha
+ * version: 1.0.0 Majestic Maidenhair
+ * Status: Gamma
  * 
 */
 
