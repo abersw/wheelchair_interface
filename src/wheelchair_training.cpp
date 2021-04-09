@@ -52,7 +52,10 @@ std::string requestUserInput() {
     std::string getUserInstructionRaw; //initialise variable for user input
     getline(std::cin, getUserInstructionRaw); //read line from user interface
     transform(getUserInstructionRaw.begin(), getUserInstructionRaw.end(), getUserInstructionRaw.begin(), ::tolower); //transform string to lower case letters
+    if (DEBUG_requestUserInput) {
+        cout << "user input is " << getUserInstructionRaw << endl; //return user input
 
+    }
     return getUserInstructionRaw; //return user input
 }
 
