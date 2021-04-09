@@ -18,6 +18,7 @@ const bool DEBUG_requestUserInput = 0;
 const bool DEBUG_main = 0;
 
 ros::Publisher *ptr_publish_espeak;
+ros::Publisher *ptr_publish_userInstruction;
 
 int wheelchair_interface_state = 1;
 std::string userInstructionRaw;
@@ -54,6 +55,15 @@ std::string requestUserInput() {
     return getUserInstructionRaw; //return user input
 }
 
+/**
+ * Function to publish the user instruction as ROS msg
+ */
+void publishUserInstruction() {
+    std_msgs::String userInsMsg;
+    userInsMsg.data = userInstructionRaw;
+
+    ptr_publish_userInstruction->publish(userInsMsg);
+}
 
 int main(int argc, char * argv[]) {
 
@@ -61,7 +71,9 @@ int main(int argc, char * argv[]) {
     ros::NodeHandle nodeHandle;
     //publish user input to wheelchair_navigation node
     ros::Publisher espeak_pub = nodeHandle.advertise<std_msgs::String>("/espeak_node/speak_line", 1000); //publisher to espeak (voice) node
+    ros::Publisher userInstruction_pub = nodeHandle.advertise<std_msgs::String>("/wheelchair_robot/user/instruction", 1000);
     ptr_publish_espeak = &espeak_pub;
+    ptr_publish_userInstruction = &userInstruction_pub;
     ros::Rate loop_rate(10);
 
     while (ros::ok()) {
@@ -74,14 +86,19 @@ int main(int argc, char * argv[]) {
                 //get user instruction
                 userInstructionRaw = requestUserInput(); //request the user's input
                 if (userInstructionRaw != "") { //if user instruction is not blank
-                    wheelchair_interface_state = 2; //go to state 2 for publishing room name
+                    if (userInstructionRaw == "quit") {
+                        wheelchair_interface_state = 0;
+                    }
+                    else {
+                        wheelchair_interface_state = 2; //go to state 2 for publishing room name
+                    }
                 }
                 break;
             case 2:
                 if (DEBUG_main) {
                     cout << userInstructionRaw << endl; //return room name
                 }
-                //publish user instruction function; //publish user instruction as ROS topic
+                publishUserInstruction(); //publish user instruction as ROS topic
                 wheelchair_interface_state = 1;
                 break;
         }
