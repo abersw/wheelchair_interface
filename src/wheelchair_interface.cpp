@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sstream>
+#include "ros/ros.h" //main ROS library
 using namespace std;
 
 
@@ -9,9 +10,7 @@ int main(int argc, char * argv[]) {
 
     ros::init(argc, argv, "wheelchair_interface");
     ros::NodeHandle nodeHandle;
-
-    ros::Publisher wheelchairGoal_pub = nodeHandle.advertise<move_base_msgs::MoveBaseActionGoal>("/move_base/goal", 1000);
-    ros::Publisher espeak_pub = nodeHandle.advertise<std_msgs::String>("/espeak_node/speak_line", 1000);
+    //publish user input to wheelchair_navigation node
     ros::Rate loop_rate(10);
 
     while (ros::ok()) {
