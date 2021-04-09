@@ -65,6 +65,11 @@ void publishUserInstruction() {
     ptr_publish_userInstruction->publish(userInsMsg);
 }
 
+/**
+ * Main function publishes espeak node and room name topics
+ *
+ * @return 0 - shouldn't reach this part unless shutting down
+ */
 int main(int argc, char * argv[]) {
 
     ros::init(argc, argv, "wheelchair_interface");
