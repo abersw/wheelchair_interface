@@ -1,0 +1,4 @@
+<launch>
+<!--add valgrind -v to launch prefix-->
+<node pkg="wheelchair_interface" name="wheelchair_user_interface" type="wheelchair_interface" output="screen" launch-prefix=""></node>
+</launch>
