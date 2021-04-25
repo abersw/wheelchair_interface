@@ -178,12 +178,17 @@ int main(int argc, char * argv[]) {
                     cout << userInstructionRaw << endl; //return room name
                 }
                 detectNumOfRooms();
-                if (roomsFound < 2) {
+                if (roomsFound < 2) { //if 0 or 1 room match found
                     publishUserInstruction(); //publish user instruction as ROS topic
                 }
                 else {
                     //found more than one room
-                    cout << "instruction not sent, please enter only one room name" << endl;
+                    std::string errorMsg = "instruction not sent, please enter only one room name";
+                    cout << errorMsg << endl; //print out error to user
+
+                    std_msgs::String espeak_msg; //initialise espak ROS msg
+                    espeak_msg.data = errorMsg; //assign user question to espeak data
+                    ptr_publish_espeak->publish(espeak_msg); //publish espeak msg
                 }
                 wheelchair_interface_state = 1; //wait for user instruction
                 break;
