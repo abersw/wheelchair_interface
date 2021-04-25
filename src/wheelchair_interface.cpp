@@ -39,6 +39,7 @@ struct Rooms roomsFileStruct[1000];
 int totalRoomsFileStruct = 0;
 
 int wheelchair_interface_state = 1;
+int roomsFound = 0;
 std::string userInstructionRaw;
 
 /**
@@ -71,6 +72,22 @@ std::string requestUserInput() {
         cout << "user input is " << getUserInstructionRaw << endl; //return user input
     }
     return getUserInstructionRaw; //return user input
+}
+
+/**
+ * Function to check if more than one room is supplied from user instruction
+ * set roomsFound var from found room name matches
+ */
+void detectNumOfRooms() {
+    int roomCount = 0;
+    for (int isRoom = 0; isRoom < totalRoomsFileStruct; isRoom++) {
+        std::string getRoomName = roomsFileStruct[isRoom].room_name; //get room name from struct
+        std::size_t foundRoomMatch = userInstructionRaw.find(getRoomName); //search for corresponding room name
+        if (foundRoomMatch != std::string::npos) { //if match is found
+            roomCount++; //found match, added to count var
+        }
+    }
+    roomsFound = roomCount; //set found matches to var
 }
 
 /**
@@ -160,8 +177,15 @@ int main(int argc, char * argv[]) {
                 if (DEBUG_main) {
                     cout << userInstructionRaw << endl; //return room name
                 }
-                publishUserInstruction(); //publish user instruction as ROS topic
-                wheelchair_interface_state = 1;
+                detectNumOfRooms();
+                if (roomsFound < 2) {
+                    publishUserInstruction(); //publish user instruction as ROS topic
+                }
+                else {
+                    //found more than one room
+                    cout << "instruction not sent, please enter only one room name" << endl;
+                }
+                wheelchair_interface_state = 1; //wait for user instruction
                 break;
         }
 
