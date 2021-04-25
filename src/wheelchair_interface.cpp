@@ -11,14 +11,32 @@
 #include <string.h>
 #include <sstream>
 #include "ros/ros.h" //main ROS library
+#include "wheelchair_msgs/roomLocations.h"
 #include "std_msgs/String.h"
 using namespace std;
 
+const bool DEBUG_roomLocationsCallback = 0;
 const bool DEBUG_requestUserInput = 0;
 const bool DEBUG_main = 0;
 
 ros::Publisher *ptr_publish_espeak;
 ros::Publisher *ptr_publish_userInstruction;
+
+struct Rooms {
+    int room_id;
+    string room_name;
+
+    float point_x; //get transform point x
+    float point_y; //get transform point y
+    float point_z; //get transform point z
+
+    float quat_x; //get transform rotation quaternion x
+    float quat_y; //get transform rotation quaternion y
+    float quat_z; //get transform rotation quaternion z
+    float quat_w; //get transform rotation quaternion w
+};
+struct Rooms roomsFileStruct[1000];
+int totalRoomsFileStruct = 0;
 
 int wheelchair_interface_state = 1;
 std::string userInstructionRaw;
@@ -66,6 +84,44 @@ void publishUserInstruction() {
 }
 
 /**
+ * Callback function triggered by list of all rooms 
+ *
+ * @param parameter 'roomLoc' is a roomLocations msg of the rooms and associated transforms from wheelchair_dacop
+ *        message belongs to wheelchair_msgs::roomLocations
+ */
+void roomLocationsCallback(const wheelchair_msgs::roomLocations roomLoc) {
+    totalRoomsFileStruct = roomLoc.totalRooms;
+    for (int isRoom = 0; isRoom < totalRoomsFileStruct; isRoom++) {
+        roomsFileStruct[isRoom].room_id = roomLoc.id[isRoom];
+        roomsFileStruct[isRoom].room_name = roomLoc.room_name[isRoom];
+
+        roomsFileStruct[isRoom].point_x = roomLoc.point_x[isRoom];
+        roomsFileStruct[isRoom].point_y = roomLoc.point_y[isRoom];
+        roomsFileStruct[isRoom].point_z = roomLoc.point_z[isRoom];
+
+        roomsFileStruct[isRoom].quat_x = roomLoc.quat_x[isRoom];
+        roomsFileStruct[isRoom].quat_y = roomLoc.quat_y[isRoom];
+        roomsFileStruct[isRoom].quat_z = roomLoc.quat_z[isRoom];
+        roomsFileStruct[isRoom].quat_w = roomLoc.quat_w[isRoom];
+
+        if (DEBUG_roomLocationsCallback) {
+            cout << 
+            roomsFileStruct[isRoom].room_id << ", " << 
+            roomsFileStruct[isRoom].room_name << ", " << 
+            
+            roomsFileStruct[isRoom].point_x << ", " << 
+            roomsFileStruct[isRoom].point_y << ", " << 
+            roomsFileStruct[isRoom].point_z << ", " << 
+
+            roomsFileStruct[isRoom].quat_x << ", " << 
+            roomsFileStruct[isRoom].quat_y << ", " << 
+            roomsFileStruct[isRoom].quat_z << ", " << 
+            roomsFileStruct[isRoom].quat_w << endl;
+        }
+    }
+}
+
+/**
  * Main function publishes espeak node and room name topics
  *
  * @return 0 - shouldn't reach this part unless shutting down
@@ -77,6 +133,7 @@ int main(int argc, char * argv[]) {
     //publish user input to wheelchair_navigation node
     ros::Publisher espeak_pub = nodeHandle.advertise<std_msgs::String>("/espeak_node/speak_line", 1000); //publisher to espeak (voice) node
     ros::Publisher userInstruction_pub = nodeHandle.advertise<std_msgs::String>("/wheelchair_robot/user/instruction", 1000);
+    ros::Subscriber room_locations_sub = nodeHandle.subscribe("/wheelchair_robot/dacop/assign_room_to_object/rooms", 10, roomLocationsCallback);
     ptr_publish_espeak = &espeak_pub;
     ptr_publish_userInstruction = &userInstruction_pub;
     ros::Rate loop_rate(10);
