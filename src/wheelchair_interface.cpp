@@ -1,8 +1,8 @@
 /*
  * wheelchair_interface.cpp
  * wheelchair_interface
- * version: 0.0.1 Majestic Maidenhair
- * Status: Pre-Alpha
+ * version: 1.0.0 Majestic Maidenhair
+ * Status: Gamma
  * 
 */
 
@@ -177,7 +177,7 @@ int main(int argc, char * argv[]) {
                 if (DEBUG_main) {
                     cout << userInstructionRaw << endl; //return room name
                 }
-                detectNumOfRooms();
+                detectNumOfRooms(); //get number of room matches in user instructions
                 if (roomsFound < 2) { //if 0 or 1 room match found
                     publishUserInstruction(); //publish user instruction as ROS topic
                 }
