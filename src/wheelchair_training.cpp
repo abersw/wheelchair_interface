@@ -84,10 +84,10 @@ void shortcutRooms() {
         userInstructionRaw = "kitchen";
     }
     else if (userInstructionRaw == ":l") {
-        userInstructionRaw == "lounge";
+        userInstructionRaw = "lounge";
     }
     else if (userInstructionRaw == ":h") {
-        userInstructionRaw == "hallway";
+        userInstructionRaw = "hallway";
     }
     else if (userInstructionRaw == ":d") {
         userInstructionRaw = "dining room";
@@ -138,6 +138,9 @@ int main(int argc, char * argv[]) {
             case 2:
                 if (DEBUG_main) {
                     cout << userInstructionRaw << endl; //return room name
+                }
+                if (userInstructionRaw == "quit") {
+                    shutdownROSnode();
                 }
                 shortcutRooms(); //if shortcut detected, change user instruction to full room name
                 publishRoomName(); //publish user instruction as ROS topic
