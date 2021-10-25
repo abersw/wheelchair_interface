@@ -70,6 +70,43 @@ void publishRoomName() {
 }
 
 /**
+ * vim style commands for room labelling
+ * :k kitchen
+ * :l lounge
+ * :h hallway
+ * :d dining room
+ * :s sun room
+ * :t bathroom
+ * :p studio
+ */
+void shortcutRooms() {
+    if (userInstructionRaw == ":k") {
+        userInstructionRaw = "kitchen";
+    }
+    else if (userInstructionRaw == ":l") {
+        userInstructionRaw == "lounge";
+    }
+    else if (userInstructionRaw == ":h") {
+        userInstructionRaw == "hallway";
+    }
+    else if (userInstructionRaw == ":d") {
+        userInstructionRaw = "dining room";
+    }
+    else if (userInstructionRaw == ":s") {
+        userInstructionRaw = "sun room";
+    }
+    else if (userInstructionRaw == ":t") {
+        userInstructionRaw = "bathroom";
+    }
+    else if (userInstructionRaw == ":p") {
+        userInstructionRaw = "studio";
+    }
+    else {
+        //don't modify userInstructionRaw
+    }
+}
+
+/**
  * Main function publishes espeak node and room name topics
  *
  * @return 0 - shouldn't reach this part unless shutting down
@@ -102,6 +139,7 @@ int main(int argc, char * argv[]) {
                 if (DEBUG_main) {
                     cout << userInstructionRaw << endl; //return room name
                 }
+                shortcutRooms(); //if shortcut detected, change user instruction to full room name
                 publishRoomName(); //publish user instruction as ROS topic
                 wheelchair_interface_state = 1;
                 break;
